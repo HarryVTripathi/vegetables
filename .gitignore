@@ -1,0 +1,8 @@
+.vscode
+**/__pycache__
+**/*.jpg
+Lib
+models
+Scripts
+share
+pyvenv.cfg

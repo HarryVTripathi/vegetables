@@ -1,0 +1,1 @@
+from .veg_class_inference import veg_class_router
