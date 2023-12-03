@@ -25,15 +25,10 @@ veg_class_router = APIRouter(tags=["classification"])
 def get_veg_label(file: UploadFile = File()):
     try:
         im = Image.open(file.file)
-        self_path = __file__.split("veg_class_inference.py")[0]
-        im_path = os.path.join(self_path, "file.jpg")
-
         if im.mode in ("RGBA", "P"): 
             im = im.convert("RGB")
-        im.save(im_path, 'JPEG', quality=50)
-    
-        img = Image.open(im_path)
 
+        img = im
         x = np.array(img)
         x = x.transpose(-1, 0, 1)
         x = (x - MEAN[:, None, None]) / STD[:, None, None]
@@ -45,8 +40,6 @@ def get_veg_label(file: UploadFile = File()):
 
         draw = ImageDraw.Draw(img)
         draw.text((0, 0),VEG_CLASSES[result_index], (0, 0, 255,))
-
-        img.save(os.path.join(self_path, "out.jpg"))
 
         imgByteArr = io.BytesIO()
         img.save(imgByteArr, format=img.format)
