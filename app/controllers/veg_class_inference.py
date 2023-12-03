@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 import numpy as np
 import openvino.runtime as ov
-from PIL import Image
-from fastapi import APIRouter
-from fastapi import FastAPI, File, UploadFile, Response
+from PIL import Image, ImageFont, ImageDraw 
+from fastapi import APIRouter, File, UploadFile, Response
+from fastapi.responses import FileResponse
 
 
 MEAN = 255 * np.array([0.485, 0.456, 0.406])
@@ -25,14 +25,14 @@ veg_class_router = APIRouter(tags=["classification"])
 def get_veg_label(file: UploadFile = File()):
     try:
         im = Image.open(file.file)
-        im_path = os.path.join(__file__.split("veg_class_inference.py")[0], "file.jpg")
+        self_path = __file__.split("veg_class_inference.py")[0]
+        im_path = os.path.join(self_path, "file.jpg")
 
         if im.mode in ("RGBA", "P"): 
             im = im.convert("RGB")
         im.save(im_path, 'JPEG', quality=50)
     
         img = Image.open(im_path)
-        print(type(img))
 
         x = np.array(img)
         x = x.transpose(-1, 0, 1)
@@ -42,7 +42,17 @@ def get_veg_label(file: UploadFile = File()):
         output_layer = compiled_model.output(0)
         result_infer = compiled_model(x)[output_layer]
         result_index = int(np.argmax(result_infer))
-        return {"result": VEG_CLASSES[result_index], "filename": file.filename}
+
+        draw = ImageDraw.Draw(img)
+        draw.text((0, 0),VEG_CLASSES[result_index], (0, 0, 255,))
+
+        img.save(os.path.join(self_path, "out.jpg"))
+
+        imgByteArr = io.BytesIO()
+        img.save(imgByteArr, format=img.format)
+        imgByteArr = imgByteArr.getvalue()
+
+        return Response(content=imgByteArr, media_type="image/jpeg")
     except Exception as e:
         print(e)
         print(traceback.format_exc())
