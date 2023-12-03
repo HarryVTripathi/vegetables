@@ -14,7 +14,7 @@ STD = 255 * np.array([0.229, 0.224, 0.225])
 VEG_CLASSES = ['Bean', 'Bitter_Gourd', 'Bottle_Gourd', 'Brinjal', 'Broccoli', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Cucumber', 'Papaya', 'Potato', 'Pumpkin', 'Radish', 'Tomato']
 
 
-model_xml = str(Path(__file__).parents[2]) + "/models/resnet18_int8.xml"
+model_xml = str(Path(__file__).parents[2]) + "/vegetables/models/resnet18_int8.xml"
 core = ov.Core()
 model = core.read_model(model=model_xml)
 compiled_model = core.compile_model(model=model, device_name="CPU")
